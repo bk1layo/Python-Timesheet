@@ -6,12 +6,19 @@ import os
 
 # Main window
 window = tk.Tk()
-window.geometry('250x100')
+window.geometry('250x120')
 
 # Variables
 currentTD = datetime.datetime.now()
 currentDate = datetime.date.today()
 currentTime = currentTD.strftime('%H:%M:%S')
+
+# Realtime Clock function
+def realtimeClock():
+    rawTD = datetime.datetime.now()
+    nowTime = rawTD.strftime('%H:%M:%S %p')
+    time.config(text = nowTime)
+    window.after(1000, realtimeClock)
 
 # Excel File Function
 def create_excel_file():
@@ -25,13 +32,13 @@ create_excel_file()
 
 # Button Function
 def clockInBut():
-    tkMessageBox.showinfo("Clocked in at: ", currentTD.strftime("%A %b %d, %Y %H:%M:%S"))
+    tkMessageBox.showinfo("Clocked in at: ", currentDate.strftime("%A, %b %d, %Y")+" "+time.cget("text"))
     
     # Open the excel file and read the data
     openTs = pd.read_excel('TimeSheet.xlsx')
     
     # Create a new row with the current date and time
-    new_row = {'Date':currentDate, 'ClockIn':currentTime, 'ClockOut':' '}
+    new_row = {'Date':currentDate, 'ClockIn':time.cget('text'), 'ClockOut':' '}
     
     # Append the new row to the dataframe
     openTs = openTs.append(new_row, ignore_index=True)
@@ -41,14 +48,14 @@ def clockInBut():
 
 
 def clockOutBut():
-    tkMessageBox.showinfo("Clocked out at: ", currentTD.strftime("%A %b %d, %Y %H:%M:%S"))
+    tkMessageBox.showinfo("Clocked out at: ", currentDate.strftime("%A, %b %d, %Y")+" "+time.cget("text"))
 
     # Open the excel file and read the data
     openTs = pd.read_excel('TimeSheet.xlsx')
     
     # Adding into ClockOut in the same row
     last_clock_in_index = openTs[openTs['ClockIn'] != ' '].index[-1]
-    openTs.at[last_clock_in_index, 'ClockOut'] = currentTime
+    openTs.at[last_clock_in_index, 'ClockOut'] = time.cget('text')
     openTs.to_excel('TimeSheet.xlsx', index=False)
     
 def openTimeSheet():
@@ -57,13 +64,14 @@ def openTimeSheet():
     
     # Printing the data file into terminal
     print(openTs)
- 
+    
 # Window Title
 window.title('TimeSheet')
 
 # Buttons and Labels
 blank = tk.Label(window)
-dateAndTime = tk.Label(window, text= currentTD.strftime("%A %b %d, %Y %H:%M:%S"))
+date = tk.Label(window, text= currentDate.strftime("%A, %b %d, %Y"))
+time = tk.Label(window, text= currentTD.strftime('%H:%M:%S %p'))
 clockIn = tk.Button(window, text='Clock In', command = clockInBut)
 clockOut = tk.Button(window, text='Clock Out', command = clockOutBut)
 timeSheetOpen = tk.Button(window, text='Open TimeSheet', command = openTimeSheet)
@@ -72,7 +80,11 @@ timeSheetOpen = tk.Button(window, text='Open TimeSheet', command = openTimeSheet
 clockIn.pack()
 clockOut.pack()
 timeSheetOpen.pack()
-dateAndTime.pack()
+date.pack()
+time.pack()
+
+# Call realtimeClock() function
+realtimeClock()
 
 # mainloop() method to display window
 window.mainloop()
