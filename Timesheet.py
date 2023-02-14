@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox as tkMessageBox
+from tkinter import messagebox as tkMB
 import datetime
 import pandas as pd
 import os
@@ -32,7 +32,7 @@ create_excel_file()
 
 # Button Function
 def clockInBut():
-    tkMessageBox.showinfo("Clocked in at: ", currentDate.strftime("%A, %b %d, %Y")+" "+time.cget("text"))
+    tkMB.showinfo("Clocked in at: ", currentDate.strftime("%A, %b %d, %Y")+" "+time.cget("text"))
     
     # Open the excel file and read the data
     openTs = pd.read_excel('TimeSheet.xlsx')
@@ -48,7 +48,7 @@ def clockInBut():
 
 
 def clockOutBut():
-    tkMessageBox.showinfo("Clocked out at: ", currentDate.strftime("%A, %b %d, %Y")+" "+time.cget("text"))
+    tkMB.showinfo("Clocked out at: ", currentDate.strftime("%A, %b %d, %Y")+" "+time.cget("text"))
 
     # Open the excel file and read the data
     openTs = pd.read_excel('TimeSheet.xlsx')
