@@ -26,14 +26,17 @@ def create_excel_file():
         data = {}
         timeSheet = pd.DataFrame(data)
         timeSheet.to_excel('TimeSheet.xlsx', sheet_name='Sheet1', index=False)
+    else:
+        timeSheet = pd.read_excel('TimeSheet.xlsx')
+        if 'HoursWorked' not in timeSheet.columns:
+            timeSheet['HoursWorked'] = ''
+            timeSheet.to_excel('TimeSheet.xlsx', index=False)
 
 # Calling the function  
 create_excel_file()
 
 # Button Function
 def clockInBut():
-    tkMB.showinfo("Clocked in at: ", currentDate.strftime("%A, %b %d, %Y")+" "+time.cget("text"))
-    
     # Open the excel file and read the data
     openTs = pd.read_excel('TimeSheet.xlsx')
     
@@ -45,18 +48,29 @@ def clockInBut():
     
     # Write the dataframe to the excel file
     openTs.to_excel('TimeSheet.xlsx', index=False)
-
+    
+    # Notification when Clocked In
+    tkMB.showinfo("Clocked in at: ", currentDate.strftime("%A, %b %d, %Y")+" "+time.cget("text"))
 
 def clockOutBut():
-    tkMB.showinfo("Clocked out at: ", currentDate.strftime("%A, %b %d, %Y")+" "+time.cget("text"))
-
     # Open the excel file and read the data
     openTs = pd.read_excel('TimeSheet.xlsx')
     
     # Adding into ClockOut in the same row
     last_clock_in_index = openTs[openTs['ClockIn'] != ' '].index[-1]
     openTs.at[last_clock_in_index, 'ClockOut'] = time.cget('text')
+    
+    # Calculate hours worked and update the dataframe
+    clock_in = datetime.datetime.strptime(openTs.at[last_clock_in_index, 'ClockIn'], '%H:%M:%S %p')
+    clock_out = datetime.datetime.strptime(time.cget('text'), '%H:%M:%S %p')
+    hours_worked = (clock_out - clock_in).total_seconds() / 3600
+    openTs.at[last_clock_in_index, 'HoursWorked'] = round(hours_worked, 2)
+    
     openTs.to_excel('TimeSheet.xlsx', index=False)
+    
+    # Notification when Clocked Out
+    tkMB.showinfo("Clocked out at: ", currentDate.strftime("%A, %b %d, %Y")+" "+time.cget("text"))
+
     
 def openTimeSheet():
     # Open the excel file and read the data
