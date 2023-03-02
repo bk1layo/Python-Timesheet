@@ -71,7 +71,6 @@ def clockOutBut():
     # Notification when Clocked Out
     tkMB.showinfo("Clocked out at: ", currentDate.strftime("%A, %b %d, %Y")+" "+time.cget("text"))
 
-    
 def openTimeSheet():
     # Open the excel file and read the data
     openTs = pd.read_excel('TimeSheet.xlsx')
