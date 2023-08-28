@@ -12,6 +12,7 @@ window.geometry('250x120')
 currentTD = datetime.datetime.now()
 currentDate = datetime.date.today()
 currentTime = currentTD.strftime('%H:%M:%S')
+path = 'TimeSheet.xlsx'
 
 # Realtime Clock function
 def realtimeClock():
@@ -25,7 +26,7 @@ def create_excel_file():
     if not os.path.exists('TimeSheet.xlsx'):
         data = {}
         timeSheet = pd.DataFrame(data)
-        timeSheet.to_excel('TimeSheet.xlsx', sheet_name='Sheet1', index=False)
+        timeSheet.to_excel(path, sheet_name='Sheet1', index=False)
     else:
         timeSheet = pd.read_excel('TimeSheet.xlsx')
         if 'HoursWorked' not in timeSheet.columns:
@@ -41,10 +42,13 @@ def clockInBut():
     openTs = pd.read_excel('TimeSheet.xlsx')
     
     # Create a new row with the current date and time
-    new_row = {'Date':currentDate, 'ClockIn':time.cget('text'), 'ClockOut':' '}
+    new_row_df = pd.DataFrame({'Date': [currentDate], 'ClockIn': [time.cget('text')], 'ClockOut':[' ']})
     
     # Append the new row to the dataframe
-    openTs = openTs.append(new_row, ignore_index=True)
+    try:
+        openTs = pd.concat([openTs, new_row_df], ignore_index=True)
+    except Exception as e:
+        print("The error: ", e)
     
     # Write the dataframe to the excel file
     openTs.to_excel('TimeSheet.xlsx', index=False)
@@ -57,9 +61,12 @@ def clockOutBut():
     openTs = pd.read_excel('TimeSheet.xlsx')
     
     # Adding into ClockOut in the same row
-    last_clock_in_index = openTs[openTs['ClockIn'] != ' '].index[-1]
-    openTs.at[last_clock_in_index, 'ClockOut'] = time.cget('text')
-    
+    try:
+        last_clock_in_index = openTs[openTs['ClockIn'] != ' '].index[-1]
+        openTs.at[last_clock_in_index, 'ClockOut'] = time.cget('text')
+    except Exception as ex:
+        tkMB.showinfo("Error!", 'There was no previous clock in, could not clock out!')
+
     # Calculate hours worked and update the dataframe
     clock_in = datetime.datetime.strptime(openTs.at[last_clock_in_index, 'ClockIn'], '%H:%M:%S %p')
     clock_out = datetime.datetime.strptime(time.cget('text'), '%H:%M:%S %p')
