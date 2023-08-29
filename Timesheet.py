@@ -82,7 +82,9 @@ def openTimeSheet():
     # Open the excel file and read the data
     openTs = pd.read_excel('TimeSheet.xlsx')
     
+    openTs_str =  openTs.to_string(index = False)
     # Printing the data file into terminal
+    tkMB.showinfo('Timesheet', openTs_str)
     print(openTs)
     
 # Window Title
