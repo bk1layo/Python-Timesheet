@@ -6,12 +6,11 @@ import os
 
 # Main window
 window = tk.Tk()
-window.geometry('250x120')
+window.geometry('250x150')
 
 # Variables
 currentTD = datetime.datetime.now()
 currentDate = datetime.date.today()
-currentTime = currentTD.strftime('%H:%M:%S')
 path = 'TimeSheet.xlsx'
 
 # Realtime Clock function
@@ -29,8 +28,8 @@ def create_excel_file():
         timeSheet.to_excel(path, sheet_name='Sheet1', index=False)
     else:
         timeSheet = pd.read_excel('TimeSheet.xlsx')
-        if 'HoursWorked' not in timeSheet.columns:
-            timeSheet['HoursWorked'] = ''
+        if 'Hours' not in timeSheet.columns:
+            timeSheet['Hours'] = ''
             timeSheet.to_excel('TimeSheet.xlsx', index=False)
 
 # Calling the function  
@@ -71,7 +70,7 @@ def clockOutBut():
     clock_in = datetime.datetime.strptime(openTs.at[last_clock_in_index, 'ClockIn'], '%H:%M:%S %p')
     clock_out = datetime.datetime.strptime(time.cget('text'), '%H:%M:%S %p')
     hours_worked = (clock_out - clock_in).total_seconds() / 3600
-    openTs.at[last_clock_in_index, 'HoursWorked'] = round(hours_worked, 2)
+    openTs.at[last_clock_in_index, 'Hours'] = round(hours_worked, 2)
     
     openTs.to_excel('TimeSheet.xlsx', index=False)
     
@@ -82,11 +81,19 @@ def openTimeSheet():
     # Open the excel file and read the data
     openTs = pd.read_excel('TimeSheet.xlsx')
     
+    # Gui pop-up of TimeSheet
     openTs_str =  openTs.to_string(index = False)
-    # Printing the data file into terminal
-    tkMB.showinfo('Timesheet', openTs_str)
-    print(openTs)
-    
+
+    sheetTL = tk.Toplevel(window)
+    sheetTL.geometry('250x190')
+    topLevel_label1 = tk.Label(sheetTL, text=openTs_str)
+    topLevel_label1.pack()
+
+def clearTimeSheet():
+    os.remove("TimeSheet.xlsx")
+    create_excel_file()
+    tkMB.showinfo('Timesheet has been cleared.')
+
 # Window Title
 window.title('TimeSheet')
 
@@ -97,11 +104,13 @@ time = tk.Label(window, text= currentTD.strftime('%H:%M:%S %p'))
 clockIn = tk.Button(window, text='Clock In', command = clockInBut)
 clockOut = tk.Button(window, text='Clock Out', command = clockOutBut)
 timeSheetOpen = tk.Button(window, text='Open TimeSheet', command = openTimeSheet)
+timeSheetClear = tk.Button(window, text='Clear TimeSheet',command = clearTimeSheet)
 
-# pack() method to put into window
+# pack() method to pack into window
 clockIn.pack()
 clockOut.pack()
 timeSheetOpen.pack()
+timeSheetClear.pack()
 date.pack()
 time.pack()
 
