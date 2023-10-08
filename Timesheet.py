@@ -81,18 +81,20 @@ def openTimeSheet():
     # Open the excel file and read the data
     openTs = pd.read_excel('TimeSheet.xlsx')
     
-    # Gui pop-up of TimeSheet
+    # openTs to string
     openTs_str =  openTs.to_string(index = False)
-
+    
+    #Toplevel of Timesheet
     sheetTL = tk.Toplevel(window)
     sheetTL.geometry('250x190')
     topLevel_label1 = tk.Label(sheetTL, text=openTs_str)
     topLevel_label1.pack()
 
 def clearTimeSheet():
+    #Deletes .xlsx file from system, then calls create_excel_file function to create a new file again
     os.remove("TimeSheet.xlsx")
     create_excel_file()
-    tkMB.showinfo('Timesheet has been cleared.')
+    tkMB.showinfo('Cleared', "Timesheet has been cleared.")
 
 # Window Title
 window.title('TimeSheet')
