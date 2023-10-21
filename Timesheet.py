@@ -33,7 +33,7 @@ def create_excel_file():
             timeSheet.to_excel('TimeSheet.xlsx', index=False)
 
 # Calling the function  
-create_excel_file()
+#create_excel_file()
 
 # Button Function
 def clockInBut():
